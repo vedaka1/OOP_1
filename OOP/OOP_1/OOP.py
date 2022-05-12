@@ -28,6 +28,8 @@ class UndeletableArgument(Exception):
 
 class Pulpit:
 
+    ''' Pulpit class. Full name is a name of manager.'''
+
     def __init__(self, name: str, faculty: str, full_name: str, room_number: int, building_number: int, phone: int,
                  number_teachers: int):
         self.name = name
@@ -49,6 +51,8 @@ class Pulpit:
 
 class Teachers:
 
+    '''Teachers class.'''
+
     def __init__(self, surname: str, name: str, patronymic: str, pulpit: Pulpit, year_of_birth: int,
                  year_of_joining: int, experience: int, position: str, gender: str, address: str, year: int, town: str,
                  telephone_number: int):
@@ -69,6 +73,8 @@ class Teachers:
 
 class Students:
 
+    '''Students class.'''
+
     def __init__(self, surname: str, name: str, patronymic: str, pulpit: Pulpit, year_of_birth: int, gender: str,
                  address: str, town: str, telephone_number=0):
         self.surname = surname
@@ -84,6 +90,8 @@ class Students:
 
 class Discipline:
 
+    '''Discipline class.'''
+
     def __init__(self, name: str, pulpit: str, hours: int, test_kind='none'):
         self.name = name
         self.pulpit = pulpit
@@ -94,13 +102,15 @@ class Discipline:
         return 'name: {0}, pulpit: {1}, hours: {2}, test_kind: {3}'.format(self.name, self.pulpit, self.hours,
                                                                            self.test_kind)
 
-    def add_hours(self, time):
-        self.hours += time
+    def __call__(self, value):
+        self.hours = value
         with open('add_hours.txt', 'a') as file:
-            file.write('when {0} : total_hours {1} : added {2} \n'.format(datetime.today(), self.hours, time))
+            file.write('when {0} : total_hours {1} : added {2} \n'.format(datetime.today(), self.hours, value))
 
 
 class LastExam(object):
+
+    '''Checking if the exam date is correct.'''
 
     def __init__(self):
         self.maxdate = date.today()
@@ -117,6 +127,8 @@ class LastExam(object):
 
 class Statement:
 
+    '''Statement class.'''
+
     def __init__(self, teacher: str, discipline: str, student: str, mark: int):
         self._teacher = teacher
         self._discipline = discipline
@@ -128,11 +140,10 @@ class Statement:
     last_exam = LastExam()
 
     def __str__(self):
-        return 'teacher: {0}, discipline: {1}, student: {2}, mark: {3}, last exam: {4}'.format(self._teacher,
-                                                                                               self._discipline,
-                                                                                               self._student,
-                                                                                               self._mark,
-                                                                                               self._last_exam)
+        return 'teacher: {0}, discipline: {1}, student: {2}, mark: {3}'.format(self._teacher,
+                                                                               self._discipline,
+                                                                               self._student,
+                                                                               self._mark)
 
     @property
     def mark(self):
@@ -151,6 +162,8 @@ class Statement:
 
 
 class StudentMark(Students):
+
+    '''Evaluate student statement'''
 
     mark = "5"
 
