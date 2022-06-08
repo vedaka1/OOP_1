@@ -20,8 +20,11 @@ Data_discipline = {
 
 Pulpit(**Data_pulpit)
 dis = Discipline(**Data_discipline)
+Statement("Кулешов В.А.", "Программирование", "Голубев М.В.", 5)
 
-# Лабораторная № 5
+# Лабораторная № 4 реализована в классах.
+
+print("Лабораторная № 5\n")
 state1 = Statement("Кулешов В.А.", "Программирование", "Голубев М.В.", 5)
 state1.last_exam = date(2031, 6, 7)
 print(state1.last_exam)
@@ -31,8 +34,13 @@ try:
 except Exception as error:
     print(error)
 
-# Лабораторная № 6
+print("Лабораторная № 6\n")
 dis(11)
 print(dis.hours)
 print(Pulpit.__doc__)
 
+print("Лабораторная № 7\n")
+exam = TakeExam(1, "Попов В.А")
+exam.exam_with_logging(5)
+
+print("Лабораторная № 8\n")

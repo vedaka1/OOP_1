@@ -70,6 +70,10 @@ class Teachers:
         self._town = town
         self._telephone_number = telephone_number
 
+    @classmethod
+    def recruit(cls, value):
+        return cls(value)
+
 
 class Students:
 
@@ -92,7 +96,7 @@ class Discipline:
 
     '''Discipline class.'''
 
-    def __init__(self, name: str, pulpit: str, hours: int, test_kind='none'):
+    def __init__(self, name: str, pulpit: Pulpit, hours: int, test_kind='none'):
         self.name = name
         self.pulpit = pulpit
         self.hours = hours
@@ -108,7 +112,7 @@ class Discipline:
             file.write('when {0} : total_hours {1} : added {2} \n'.format(datetime.today(), self.hours, value))
 
 
-class LastExam(object):
+class LastExam:
 
     '''Checking if the exam date is correct.'''
 
@@ -129,22 +133,30 @@ class Statement:
 
     '''Statement class.'''
 
-    def __init__(self, teacher: str, discipline: str, student: str, mark: int):
-        self._teacher = teacher
-        self._discipline = discipline
-        self._student = student
-        self._mark = mark
+    def __init__(self, teacher=None, discipline=None, student=None, mark=0):
+        self.teacher = teacher
+        self.discipline = discipline
+        self.student = student
+        self.mark = mark
 
         self.id = _next_statement_id()
 
     last_exam = LastExam()
 
     def __str__(self):
-        return 'teacher: {0}, discipline: {1}, student: {2}, mark: {3}'.format(self._teacher,
-                                                                               self._discipline,
-                                                                               self._student,
-                                                                               self._mark)
+        return 'teacher: {0}, discipline: {1}, student: {2}, mark: {3}'.format(self.teacher,
+                                                                               self.discipline,
+                                                                               self.student,
+                                                                               self.mark)
 
+    @staticmethod
+    def log(func):
+        def wrapper(*args, **kwargs):
+            print('* Called `{}`.\n* Args: {}\n* Kwargs: {}'.format(func.__name__, args, kwargs))
+            return func(*args, **kwargs)
+        return wrapper
+
+# Лабораторная № 5
     @property
     def mark(self):
         return self._mark
@@ -160,15 +172,25 @@ class Statement:
     def mark(self):
         raise UndeletableArgument()
 
+# Лабораторная № 7
+class TakeExam:
 
-class StudentMark(Students):
+    def __init__(self, number: int, student: str, discipline=None, mark=None):
+        self.number = number
+        self.person = student
+        self.exam = Statement(discipline, mark)
 
-    '''Evaluate student statement'''
-
-    mark = "5"
+    def get_mark(self, x: int):
+        self.exam.mark = x
 
     def __str__(self):
-        return '{0},{1}, mark: {2}'.format(self.name, self.surname, self.mark)
+        return 'number {0}, student: {1}, discipline: {2}, mark: {3}'.format(self.number,
+                                                                             self.person,
+                                                                             self.exam.discipline,
+                                                                             self.exam.mark)
+    @Statement.log
+    def exam_with_logging(self, x: int):
+        return self.get_mark(x)
 
 
 class PersistencePulpit:
@@ -183,3 +205,5 @@ class PersistencePulpit:
         with open('pulpit.pkl', 'rb') as file:
             pulpit = pickle.load(file)
         return pulpit
+
+
