@@ -1,4 +1,4 @@
-from OOP import *
+from classes import *
 
 
 Data_pulpit = {
@@ -43,4 +43,4 @@ print("Лабораторная № 7\n")
 exam = TakeExam(1, "Попов В.А")
 exam.exam_with_logging(5)
 
-print("Лабораторная № 8\n")
+print("Лабораторная № 8\nНаходится в файле DBconsole, сам класс датабазы в classes")

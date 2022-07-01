@@ -103,13 +103,17 @@ class Discipline:
         self.test_kind = test_kind
 
     def __str__(self):
-        return 'name: {0}, pulpit: {1}, hours: {2}, test_kind: {3}'.format(self.name, self.pulpit, self.hours,
+        return 'name: {0}, pulpit: {1}, hours: {2}, test_kind: {3}'.format(self.name,
+                                                                           self.pulpit,
+                                                                           self.hours,
                                                                            self.test_kind)
 
     def __call__(self, value):
         self.hours = value
         with open('add_hours.txt', 'a') as file:
-            file.write('when {0} : total_hours {1} : added {2} \n'.format(datetime.today(), self.hours, value))
+            file.write('when {0} : total_hours {1} : added {2} \n'.format(datetime.today(),
+                                                                          self.hours,
+                                                                          value))
 
 
 class LastExam:
@@ -172,22 +176,24 @@ class Statement:
     def mark(self):
         raise UndeletableArgument()
 
+
 # Лабораторная № 7
 class TakeExam:
 
-    def __init__(self, number: int, student: str, discipline=None, mark=None):
-        self.number = number
+    def __init__(self, mark: int, student=None, discipline=None, number=0):
         self.person = student
-        self.exam = Statement(discipline, mark)
+        self.exam = Statement(discipline)
+        self.mark = mark
+        self.number = number
 
     def get_mark(self, x: int):
-        self.exam.mark = x
+        self.mark = x
 
     def __str__(self):
-        return 'number {0}, student: {1}, discipline: {2}, mark: {3}'.format(self.number,
-                                                                             self.person,
-                                                                             self.exam.discipline,
-                                                                             self.exam.mark)
+        return 'student: {0}, discipline: {1}, mark: {2}'.format(self.person,
+                                                                 self.exam.discipline,
+                                                                 self.mark)
+
     @Statement.log
     def exam_with_logging(self, x: int):
         return self.get_mark(x)
@@ -206,4 +212,65 @@ class PersistencePulpit:
             pulpit = pickle.load(file)
         return pulpit
 
+
+class ExamDatabase(object):
+    def __init__(self):
+        self.filename = 'exam.pkl'
+        self.database = {}
+        self.index = 0
+        try:
+            self.open_database()
+        except:
+            self.save_database()
+    number = property(lambda self: self.database[self.index].number)
+    mark = property(lambda self: self.database[self.index].balance)
+
+    def __iter__(self):
+        for item in self.database:
+            yield self.database[item]
+
+    def next(self):
+        if self.index == len(self.database):
+            raise StopIteration
+        self.index = self.index + 1
+        return self.database[self.index]
+
+    def prev(self):
+        if self.index == 0:
+            raise StopIteration
+        self.index = self.index - 1
+        return self.database[self.index]
+
+    def open_database(self):
+        with open(self.filename, 'rb') as f:
+            self.database = pickle.load(f)
+        f.closed
+
+    def save_database(self):
+        with open(self.filename, 'wb') as f:
+            pickle.dump(self.database, f)
+        f.closed
+
+    def add_exam(self, mark, student):
+        ex = TakeExam(mark, student)
+        if ex.number in self.database:
+            ex.number = len(self.database) + 1
+        self.database[ex.number] = ex
+        self.save_database()
+
+    def get_exam_by_number(self, number):
+        if number not in self.database:
+            return None
+        return self.database[number]
+
+    def delete_exam(self, number):
+        del self.database[number]
+        self.save_database()
+
+    def change_mark(self, number, mark):
+        exam = self.get_exam_by_number(number)
+        if not exam:
+            raise ValueError('value does not exist')
+        exam.mark = mark
+        self.save_database()
 
